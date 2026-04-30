@@ -1,5 +1,5 @@
 {
-  "name": "fernlaunch",
+  "name": "fernlauncher",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -41,8 +41,8 @@
   },
   "main": "dist-electron/main.js",
   "build": {
-    "appId": "com.fernlaunch.app",
-    "productName": "Fernlaunch",
+    "appId": "com.fernlauncher.app",
+    "productName": "Fernlauncher",
     "copyright": "Copyright © 2026 FernLauncher",
     "icon": "public/icon.ico",
     "files": [
@@ -66,7 +66,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Fernlaunch"
+      "shortcutName": "Fernlauncher"
     },
     "publish": {
       "provider": "github",
