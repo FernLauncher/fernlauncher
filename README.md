@@ -94,10 +94,8 @@ Currently available:
 ## Roadmap
 
 - [ ] ATLauncher / FTB / Technic modpack support
-- [ ] Offline account support
 - [ ] macOS & Linux support
 - [ ] More language translations
-- [ ] Mod update checker
 
 ---
 

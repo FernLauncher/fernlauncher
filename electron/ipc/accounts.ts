@@ -22,6 +22,7 @@ export function registerAccountHandlers() {
   })
 
   ipcMain.handle('accounts:setActive', (_event, id: string) => {
+    console.log('[Accounts] Setting active:', id)
     accountManager.setActive(id)
     BrowserWindow.getAllWindows().forEach(win => {
       win.webContents.send('accounts:updated')
@@ -30,5 +31,11 @@ export function registerAccountHandlers() {
 
   ipcMain.handle('accounts:refresh', (_event, id: string) => {
     return accountManager.refresh(id)
+  })
+
+  ipcMain.handle('accounts:addOffline', (_event, username: string) => {
+    const account = accountManager.addOffline(username)
+    BrowserWindow.getAllWindows().forEach(win => win.webContents.send('accounts:updated'))
+    return account
   })
 }

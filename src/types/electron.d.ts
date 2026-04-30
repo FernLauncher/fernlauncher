@@ -72,6 +72,7 @@ declare global {
       installUpdate: () => Promise<void>
       openFileDialog: (options: any) => Promise<{ filePaths: string[] }>
       onUpdateProgress: (cb: (percent: number) => void) => void
+      addOfflineAccount: (username: string) => Promise<Account>
       java:downloadProgress
       on: (channel: string, callback: (...args: unknown[]) => void) => void
       off: (channel: string, callback: (...args: unknown[]) => void) => void

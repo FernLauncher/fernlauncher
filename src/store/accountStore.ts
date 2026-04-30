@@ -33,7 +33,8 @@ export const useAccountStore = create<AccountStore>((setState, getState) => ({
     }))
   },
 
-  setActive: (id) => {
+  setActive: async (id) => {
+    await window.electron.setActiveAccount(id)
     setState(state => ({
       accounts: state.accounts.map(a => ({ ...a, isActive: a.id === id }))
     }))

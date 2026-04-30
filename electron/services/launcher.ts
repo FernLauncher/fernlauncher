@@ -382,6 +382,7 @@ export async function launchInstance(instanceId: string): Promise<void> {
   const mcDir = path.join(instancePath, 'minecraft')
   const cfg = config.store
   const account = accountManager.getActive()
+  console.log('[Launch] Active account:', account?.minecraftUsername, account?.type)
   if (!account) throw new Error('No active account. Please log in first.')
 
   sendStatus(instanceId, 'downloading')
@@ -613,11 +614,11 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
     game_directory: mcDir,
     assets_root: assetsDir,
     assets_index_name: assetIndex.id,
-    auth_uuid: account.id,
-    auth_access_token: account.accessToken,
+    auth_uuid: account.type === 'offline' ? account.id.replace(/-/g, '') : account.id,
+    auth_access_token: account.type === 'offline' ? '0' : account.accessToken,
     clientid: '00000000402b5328',
     auth_xuid: '',
-    user_type: 'msa',
+    user_type: account.type === 'offline' ? 'legacy' : 'msa',
     version_type: versionJson.type,
     user_properties: '{}',  // add this
   }

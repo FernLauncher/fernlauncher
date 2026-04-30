@@ -62,4 +62,37 @@ export const accountManager = {
       writeAccounts(accounts)
     }
   },
+
+  addOffline(username: string): Account {
+    const accounts = readAccounts()
+    
+    // Generate a deterministic UUID from username
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c, i) => {
+      const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), i)
+      const r = (hash + Math.random() * 16) % 16 | 0
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+    })
+
+    const account: Account = {
+      id: uuid,
+      username,
+      minecraftUsername: username,
+      accessToken: 'offline',
+      refreshToken: '',
+      expiresAt: '',
+      type: 'offline',
+      isActive: accounts.length === 0,
+      status: 'ready',
+    }
+
+    const existing = accounts.findIndex(a => a.id === uuid)
+    if (existing >= 0) {
+      accounts[existing] = account
+    } else {
+      accounts.push(account)
+    }
+
+    writeAccounts(accounts)
+    return account
+  },
 }
