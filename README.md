@@ -1,7 +1,7 @@
 <div align="center">
   <img src="public/icon.png" alt="Fernlauncher" width="128" />
   
-  # 🌿 Fernlauncher
+  # Fernlauncher
   
   **A modern, open-source Minecraft launcher built with Electron & React**
   
