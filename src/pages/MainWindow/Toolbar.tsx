@@ -64,7 +64,7 @@ function Toolbar({ onAddInstance }: Props) {
     closeMenus()
     switch (item) {
       case 'Report a Bug or Suggest a Feature':
-        window.electron.openExternalUrl('https://github.com/fernlaunch/fernlaunch/issues')
+        window.electron.openExternalUrl('https://github.com/FernLauncher/fernlauncher/issues')
         break
       case 'Discord':
         window.electron.openExternalUrl('https://discord.gg/fernlaunch')

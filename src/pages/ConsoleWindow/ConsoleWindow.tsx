@@ -21,7 +21,7 @@ function parseLine(line: string): LogLine {
 }
 
 function ConsoleWindow({ instanceId }: Props) {
-  const { t } = useI18n()
+  useI18n()
   const [lines, setLines] = useState<LogLine[]>([])
   const [search, setSearch] = useState('')
   const [keepUpdating, setKeepUpdating] = useState(true)

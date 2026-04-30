@@ -104,7 +104,7 @@ function findJavaInDir(dir: string): JavaInstall[] {
 function getRequiredJavaMajor(mcVersion: string): number {
   const parts = mcVersion.split('.')
   const minor = parseInt(parts[1] ?? '0')
-  const patch = parseInt(parts[2] ?? '0')
+  parseInt(parts[2] ?? '0')
   if (minor >= 21) return 21
   if (minor >= 18) return 17
   if (minor >= 17) return 17

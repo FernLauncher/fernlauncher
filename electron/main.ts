@@ -185,6 +185,10 @@ app.whenReady().then(() => {
     autoUpdater.on('update-downloaded', () => {
       BrowserWindow.getAllWindows()[0]?.webContents.send('update:downloaded')
     })
+    
+    autoUpdater.on('download-progress', (progress) => {
+      BrowserWindow.getAllWindows()[0]?.webContents.send('update:progress', Math.round(progress.percent))
+})
   }
 
   ipcMain.handle('update:install', () => {

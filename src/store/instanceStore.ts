@@ -12,7 +12,7 @@ interface InstanceStore {
   update: (instance: Instance) => void
 }
 
-export const useInstanceStore = create<InstanceStore>((setState, getState) => ({
+export const useInstanceStore = create<InstanceStore>((setState) => ({
   instances: [],
   selectedId: null,
   isLoading: false,

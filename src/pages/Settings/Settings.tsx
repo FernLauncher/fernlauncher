@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useI18n } from '../../hooks/useI18n'
-import { useSettingsStore } from '../../store/settingsStore'
 import General from './General'
 import Language from './Language'
 import Appearance from './Appearance'

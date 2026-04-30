@@ -60,6 +60,7 @@ contextBridge.exposeInMainWorld('electron', {
   onUpdateAvailable: (cb: () => void) => ipcRenderer.on('update:available', cb),
   onUpdateDownloaded: (cb: () => void) => ipcRenderer.on('update:downloaded', cb),
   installUpdate: () => ipcRenderer.invoke('update:install'),
+  onUpdateProgress: (cb: (percent: number) => void) => ipcRenderer.on('update:progress', (_e, percent) => cb(percent)),
 
   // settings
   openSettings: () => ipcRenderer.invoke('window:settings'),

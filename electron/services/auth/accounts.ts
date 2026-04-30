@@ -1,5 +1,4 @@
 import fs from 'fs'
-import path from 'path'
 import { Paths } from '../../utils/paths'
 import { loginWithMicrosoft, refreshMicrosoftToken } from './microsoft'
 

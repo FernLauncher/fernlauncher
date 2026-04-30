@@ -33,18 +33,6 @@ function Appearance() {
           <button>Open Folder</button>
         </div>
         <div className={styles.row}>
-          <span className={styles.label}>Cat Pack</span>
-          <select
-            className={styles.select}
-            value={config.appearance.catPack}
-            onChange={e => set('appearance', { ...config.appearance, catPack: e.target.value })}
-          >
-            <option>Rory ID 11 (drawn by Ashtaka)</option>
-            <option>None</option>
-          </select>
-          <button>Open Folder</button>
-        </div>
-        <div className={styles.row}>
           <button>Reload All</button>
         </div>
       </div>
@@ -69,30 +57,6 @@ function Appearance() {
             value={config.appearance.consoleFontSize}
             onChange={e => set('appearance', { ...config.appearance, consoleFontSize: Number(e.target.value) })}
           />
-        </div>
-        <div className={styles.row}>
-          <span className={styles.label}>Cat Opacity</span>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={config.appearance.catOpacity}
-            onChange={e => set('appearance', { ...config.appearance, catOpacity: Number(e.target.value) })}
-            style={{ flex: 1 }}
-          />
-        </div>
-        <div className={styles.row}>
-          <span className={styles.label}>Cat Scaling</span>
-          <select
-            className={styles.select}
-            style={{ width: 100 }}
-            value={config.appearance.catScaling}
-            onChange={e => set('appearance', { ...config.appearance, catScaling: e.target.value as 'fit' | 'fill' | 'stretch' })}
-          >
-            <option value="fit">Fit</option>
-            <option value="fill">Fill</option>
-            <option value="stretch">Stretch</option>
-          </select>
         </div>
       </div>
     </div>

@@ -16,16 +16,6 @@ const TABS = [
   { id: 'otherlogs', label: '📄 Other Logs' },
 ]
 
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div className={styles.comingSoon}>
-      <div className={styles.comingSoonIcon}>🌿</div>
-      <div className={styles.comingSoonText}>{label}</div>
-      <div className={styles.comingSoonSub}>Coming soon</div>
-    </div>
-  )
-}
-
 interface ModrinthProject {
   project_id: string
   slug: string
@@ -634,11 +624,12 @@ function LogTab({ instanceId }: { instanceId: string }) {
     window.electron.readLog(instanceId).then(setLog)
     window.electron.watchLog(instanceId)
 
-    const unsub = window.electron.on('instance:logUpdated', (content: string) => {
+    const handler = (...args: unknown[]) => {
+      const content = args[0] as string
       setLog(content)
-    })
-
-    return () => unsub?.()
+    }
+    window.electron.on('instance:logUpdated', handler)
+    return () => window.electron.off('instance:logUpdated', handler)
   }, [instanceId])
 
   useEffect(() => {

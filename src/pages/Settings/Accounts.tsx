@@ -5,7 +5,7 @@ import styles from './SettingsPage.module.css'
 
 function Accounts() {
   const { t } = useI18n()
-  const { accounts, load, setActive, remove } = useAccountStore()
+  const { accounts, load, setActive } = useAccountStore()
 
   useEffect(() => {
     load()

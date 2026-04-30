@@ -8,7 +8,7 @@ function About() {
       <div className={styles.version}>Version 1.0.0</div>
       <div className={styles.desc}>A Minecraft launcher built with Electron & React</div>
       <div className={styles.links}>
-        <button onClick={() => window.electron.openExternalUrl('https://github.com/fernlaunch/fernlaunch')}>
+        <button onClick={() => window.electron.openExternalUrl('https://github.com/FernLauncher/fernlauncher')}>
           GitHub
         </button>
         <button onClick={() => window.electron.openExternalUrl('https://discord.gg/fernlaunch')}>

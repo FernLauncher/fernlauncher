@@ -1,30 +1,112 @@
-# React + TypeScript + Vite
+<div align="center">
+  <img src="public/icon.ico" alt="Fernlaunch" width="128" />
+  
+  # 🌿 Fernlaunch
+  
+  **A modern, open-source Minecraft launcher built with Electron & React**
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+  [![GitHub release](https://img.shields.io/github/v/release/FernLauncher/fernlauncher)](https://github.com/FernLauncher/fernlauncher/releases)
+  [![Platform](https://img.shields.io/badge/platform-Windows-blue)](https://github.com/FernLauncher/fernlauncher/releases)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+</div>
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+### Game Support
+- Vanilla Minecraft (all versions)
+- **Fabric**, **Quilt**, **Forge** (1.8.9, 1.12.2, 1.21+), **NeoForge**
+- Auto Java detection & download (Java 8, 17, 21)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Instance Management
+- Create, copy, export & import instances
+- Instance groups & custom icons
+- Per-instance settings (memory, Java, JVM args, resolution)
+- Playtime tracking
 
-- Configure the top-level `parserOptions` property like this:
+### Mod Management
+- Browse & install mods from **Modrinth** and **CurseForge**
+- Auto-install mod dependencies
+- Resource pack & shader pack browser
+- Server list manager
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+### Modpack Support
+- **Modrinth** modpacks (fully automatic)
+- **CurseForge** modpacks (with manual download fallback for blocked files)
+- Live installation progress
+
+### Other Features
+- Microsoft account authentication
+- Dark / Light / System theme
+- English & French translations
+- Auto-updater via GitHub Releases
+- Console window with colored logs
+- Screenshots viewer
+- Minecraft log viewer
+
+---
+
+## Installation
+
+Download the latest installer from the [Releases](https://github.com/FernLauncher/fernlauncher/releases) page.
+
+**Requirements:**
+- Windows 10/11 (64-bit)
+- Internet connection for first setup
+
+Java is automatically downloaded if not found on your system.
+
+---
+
+## Building from Source
+
+**Prerequisites:**
+- [Node.js](https://nodejs.org/) 18+
+- [pnpm](https://pnpm.io/)
+
+```bash
+# Clone the repository
+git clone https://github.com/FernLauncher/fernlauncher.git
+cd fernlauncher
+
+# Install dependencies
+pnpm install
+
+# Run in development mode
+pnpm run dev
+
+# Build installer
+pnpm run dist
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+---
+
+## Translations
+
+Currently available:
+- 🇺🇸 English (100%)
+- 🇫🇷 Français (20%)
+
+---
+
+## Roadmap
+
+- [ ] ATLauncher / FTB / Technic modpack support
+- [ ] Offline account support
+- [ ] macOS & Linux support
+- [ ] More language translations
+- [ ] Mod update checker
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+  Made with 🌿 by <a href="https://github.com/FernLauncher">FernLauncher</a>
+</div>

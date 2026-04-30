@@ -23,6 +23,9 @@ function parseServersNbt(buf: Buffer): { name: string, ip: string, icon: string 
     const decompressed = zlib.gunzipSync(buf)
     buf = decompressed
   } catch {
+    // already uncompressed
+  }
+
   const servers: { name: string, ip: string, icon: string }[] = []
   let offset = 0
 
@@ -37,7 +40,7 @@ function parseServersNbt(buf: Buffer): { name: string, ip: string, icon: string 
     const name = buf.slice(offset, offset + nameLen).toString('utf8'); offset += nameLen
 
     if (name === 'servers' && tagType === 9) {
-      const listType = buf[offset++]
+      buf[offset++]
       const listLen = buf.readInt32BE(offset); offset += 4
       for (let i = 0; i < listLen; i++) {
         const server: any = { name: '', ip: '', icon: '' }
@@ -102,14 +105,12 @@ function writeServersNbt(servers: { name: string, ip: string }[]): Buffer {
     ...serverBufs,
   ])
 
-  // Return uncompressed — Minecraft 1.21+ reads servers.dat uncompressed
   return Buffer.concat([
     Buffer.from([10]),
     writeString(''),
     listTag,
     Buffer.from([0]),
   ])
-}
 }
 
 // ─── CurseForge helpers ───────────────────────────────────────────────────────

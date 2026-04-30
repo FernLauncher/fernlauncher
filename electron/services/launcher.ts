@@ -1,5 +1,4 @@
-import { spawn, ChildProcess } from 'child_process'
-import { BrowserWindow } from 'electron'
+import { spawn, ChildProcess, execSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import https from 'https'

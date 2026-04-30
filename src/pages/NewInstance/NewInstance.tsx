@@ -97,7 +97,6 @@ function NewInstance({ onClose }: Props) {
   const [modpackVersions, setModpackVersions] = useState<ModrinthVersion[]>([])
   const [selectedModpackVersion, setSelectedModpackVersion] = useState<ModrinthVersion | null>(null)
   const [installing, setInstalling] = useState(false)
-  const [installProgress, setInstallProgress] = useState('')
   const [manualFiles, setManualFiles] = useState<ManualFile[]>([])
   const [showManualModal, setShowManualModal] = useState(false)
   const [pendingInstance, setPendingInstance] = useState<Instance | null>(null)
@@ -234,7 +233,7 @@ function NewInstance({ onClose }: Props) {
   async function handleInstallModpack() {
     if (!selectedModpackVersion) return
     setInstalling(true)
-    setInstallProgress('Installing modpack...')
+    setProgressMsg('Installing modpack...')
     try {
       const result = await window.electron.installModrinthModpack(
         selectedModpackVersion.id,
@@ -263,7 +262,7 @@ function NewInstance({ onClose }: Props) {
       alert(`Failed to install modpack: ${e.message}`)
     } finally {
       setInstalling(false)
-      setInstallProgress('')
+      setProgressMsg('')
     }
   }
 

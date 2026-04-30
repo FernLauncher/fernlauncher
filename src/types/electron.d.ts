@@ -70,6 +70,8 @@ declare global {
       onUpdateAvailable: (cb: () => void) => void
       onUpdateDownloaded: (cb: () => void) => void
       installUpdate: () => Promise<void>
+      openFileDialog: (options: any) => Promise<{ filePaths: string[] }>
+      onUpdateProgress: (cb: (percent: number) => void) => void
       java:downloadProgress
       on: (channel: string, callback: (...args: unknown[]) => void) => void
       off: (channel: string, callback: (...args: unknown[]) => void) => void

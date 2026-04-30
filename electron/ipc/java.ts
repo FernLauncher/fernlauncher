@@ -1,5 +1,5 @@
 import { ipcMain, dialog, BrowserWindow } from 'electron'
-import { join, dirname, basename } from 'path'
+import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { javaManager } from '../services/javaManager'
 import https from 'https'

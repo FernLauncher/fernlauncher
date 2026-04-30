@@ -12,6 +12,7 @@ function MainWindow() {
   const { load: loadAccounts } = useAccountStore()
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [updateDownloaded, setUpdateDownloaded] = useState(false)
+  const [updateProgress, setUpdateProgress] = useState(0)
 
 
   useEffect(() => {
@@ -32,6 +33,10 @@ function MainWindow() {
     window.electron.onUpdateDownloaded(() => setUpdateDownloaded(true))
   }, [])
 
+  useEffect(() => {
+    window.electron.onUpdateProgress(pct => setUpdateProgress(pct))
+  }, [])
+
   const selected = instances.find(i => i.id === selectedId) ?? null
 
   return (
@@ -44,7 +49,7 @@ function MainWindow() {
       )}
       {updateAvailable && !updateDownloaded && (
         <div className={styles.updateBanner}>
-          ⬇ Downloading update...
+          ⬇ Downloading update... {updateProgress}%
         </div>
       )}
       <Toolbar onAddInstance={() => window.electron.openNewInstance()} />
