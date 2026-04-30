@@ -14,6 +14,9 @@ function About() {
         <button onClick={() => window.electron.openExternalUrl('https://discord.gg/fernlaunch')}>
           Discord
         </button>
+        <button onClick={() => window.electron.openExternalUrl('https://github.com/FernLauncher/fernlauncher')}>
+          Website
+        </button>
       </div>
       <div className={styles.credits}>
         <div className={styles.creditsTitle}>Built with</div>

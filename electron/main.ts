@@ -71,6 +71,7 @@ function createFirstLaunchWindow() {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
     },
+    icon: join(app.getAppPath(), 'public/iconreal.ico')
   })
 
   win.setMenuBarVisibility(false)
@@ -99,6 +100,7 @@ function createNewInstanceWindow() {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
     },
+    icon: join(app.getAppPath(), 'public/iconreal.ico')
   })
 
   win.setMenuBarVisibility(false)
@@ -126,6 +128,7 @@ function createSettingsWindow() {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
     },
+    icon: join(app.getAppPath(), 'public/iconreal.ico')
   })
 
   win.setMenuBarVisibility(false)
@@ -153,6 +156,7 @@ function createConsoleWindow(instanceId: string) {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
     },
+    icon: join(app.getAppPath(), 'public/iconreal.ico')
   })
   win.setMenuBarVisibility(false)
   registerConsoleWindow(instanceId, win)
@@ -185,7 +189,7 @@ app.whenReady().then(() => {
     autoUpdater.on('update-downloaded', () => {
       BrowserWindow.getAllWindows()[0]?.webContents.send('update:downloaded')
     })
-    
+
     autoUpdater.on('download-progress', (progress) => {
       BrowserWindow.getAllWindows()[0]?.webContents.send('update:progress', Math.round(progress.percent))
 })
@@ -261,6 +265,7 @@ app.whenReady().then(() => {
         preload: join(__dirname, '../dist-electron/preload.cjs'),
         sandbox: false,
       },
+      icon: join(app.getAppPath(), 'public/iconreal.ico')
     })
     win.setMenuBarVisibility(false)
     if (RENDERER_URL) {

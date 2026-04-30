@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/icon.ico" alt="Fernlauncher" width="128" />
+  <img src="public/icon.png" alt="Fernlauncher" width="128" />
   
   # 🌿 Fernlauncher
   

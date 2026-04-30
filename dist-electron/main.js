@@ -517,7 +517,7 @@ if (!IS_WINDOWS) {
 if (IS_LINUX) {
   Signals.push("SIGIO", "SIGPOLL", "SIGPWR", "SIGSTKFLT");
 }
-class Interceptor {
+let Interceptor$1 = class Interceptor {
   /* CONSTRUCTOR */
   constructor() {
     this.callbacks = /* @__PURE__ */ new Set();
@@ -554,9 +554,9 @@ class Interceptor {
     };
     this.hook();
   }
-}
-const Interceptor$1 = new Interceptor();
-const whenExit = Interceptor$1.register;
+};
+const Interceptor2 = new Interceptor$1();
+const whenExit = Interceptor2.register;
 const Temp = {
   /* VARIABLES */
   store: {},
@@ -9717,7 +9717,7 @@ const ltr = ltr_1;
 const intersects = intersects_1;
 const simplifyRange = simplify;
 const subset = subset_1;
-var semver$1 = {
+var semver$2 = {
   parse,
   valid,
   clean,
@@ -9764,7 +9764,7 @@ var semver$1 = {
   compareIdentifiers: identifiers.compareIdentifiers,
   rcompareIdentifiers: identifiers.rcompareIdentifiers
 };
-const semver$2 = /* @__PURE__ */ getDefaultExportFromCjs(semver$1);
+const semver$1 = /* @__PURE__ */ getDefaultExportFromCjs(semver$2);
 const objectToString$1 = Object.prototype.toString;
 const uint8ArrayStringified = "[object Uint8Array]";
 const arrayBufferStringified = "[object ArrayBuffer]";
@@ -10274,7 +10274,7 @@ class Conf {
         throw new Error(`Something went wrong during the migration! Changes applied to the store until this failed migration will be restored. ${errorMessage}`);
       }
     }
-    if (this._isVersionInRangeFormat(previousMigratedVersion) || !semver$2.eq(previousMigratedVersion, versionToMigrate)) {
+    if (this._isVersionInRangeFormat(previousMigratedVersion) || !semver$1.eq(previousMigratedVersion, versionToMigrate)) {
       this._set(MIGRATION_KEY, versionToMigrate);
     }
   }
@@ -10305,19 +10305,19 @@ class Conf {
     return candidate === INTERNAL_KEY || candidate.startsWith(`${INTERNAL_KEY}.`);
   }
   _isVersionInRangeFormat(version2) {
-    return semver$2.clean(version2) === null;
+    return semver$1.clean(version2) === null;
   }
   _shouldPerformMigration(candidateVersion, previousMigratedVersion, versionToMigrate) {
     if (this._isVersionInRangeFormat(candidateVersion)) {
-      if (previousMigratedVersion !== "0.0.0" && semver$2.satisfies(previousMigratedVersion, candidateVersion)) {
+      if (previousMigratedVersion !== "0.0.0" && semver$1.satisfies(previousMigratedVersion, candidateVersion)) {
         return false;
       }
-      return semver$2.satisfies(versionToMigrate, candidateVersion);
+      return semver$1.satisfies(versionToMigrate, candidateVersion);
     }
-    if (semver$2.lte(candidateVersion, previousMigratedVersion)) {
+    if (semver$1.lte(candidateVersion, previousMigratedVersion)) {
       return false;
     }
-    if (semver$2.gt(candidateVersion, versionToMigrate)) {
+    if (semver$1.gt(candidateVersion, versionToMigrate)) {
       return false;
     }
     return true;
@@ -24951,7 +24951,7 @@ Object.defineProperty(GitHubProvider$1, "__esModule", { value: true });
 GitHubProvider$1.GitHubProvider = GitHubProvider$1.BaseGitHubProvider = void 0;
 GitHubProvider$1.computeReleaseNotes = computeReleaseNotes;
 const builder_util_runtime_1$c = out;
-const semver = semver$1;
+const semver = semver$2;
 const url_1$4 = require$$2$2;
 const util_1$3 = util;
 const Provider_1$9 = Provider$1;
@@ -26370,7 +26370,7 @@ const fs_extra_1$4 = lib;
 const js_yaml_1 = jsYaml;
 const lazy_val_1 = main;
 const path$4 = path$n;
-const semver_1 = semver$1;
+const semver_1 = semver$2;
 const DownloadedUpdateHelper_1 = DownloadedUpdateHelper$1;
 const ElectronAppAdapter_1 = ElectronAppAdapter$1;
 const electronHttpExecutor_1 = electronHttpExecutor;
@@ -28194,7 +28194,8 @@ function createFirstLaunchWindow() {
     webPreferences: {
       preload: join(__dirname$1, "../dist-electron/preload.cjs"),
       sandbox: false
-    }
+    },
+    icon: join(app$1.getAppPath(), "public/iconreal.ico")
   });
   win.setMenuBarVisibility(false);
   if (RENDERER_URL) {
@@ -28218,7 +28219,8 @@ function createNewInstanceWindow() {
     webPreferences: {
       preload: join(__dirname$1, "../dist-electron/preload.cjs"),
       sandbox: false
-    }
+    },
+    icon: join(app$1.getAppPath(), "public/iconreal.ico")
   });
   win.setMenuBarVisibility(false);
   if (RENDERER_URL) {
@@ -28241,7 +28243,8 @@ function createSettingsWindow() {
     webPreferences: {
       preload: join(__dirname$1, "../dist-electron/preload.cjs"),
       sandbox: false
-    }
+    },
+    icon: join(app$1.getAppPath(), "public/iconreal.ico")
   });
   win.setMenuBarVisibility(false);
   if (RENDERER_URL) {
@@ -28264,7 +28267,8 @@ function createConsoleWindow(instanceId) {
     webPreferences: {
       preload: join(__dirname$1, "../dist-electron/preload.cjs"),
       sandbox: false
-    }
+    },
+    icon: join(app$1.getAppPath(), "public/iconreal.ico")
   });
   win.setMenuBarVisibility(false);
   registerConsoleWindow(instanceId, win);
@@ -28361,7 +28365,8 @@ app$1.whenReady().then(() => {
       webPreferences: {
         preload: join(__dirname$1, "../dist-electron/preload.cjs"),
         sandbox: false
-      }
+      },
+      icon: join(app$1.getAppPath(), "public/iconreal.ico")
     });
     win.setMenuBarVisibility(false);
     if (RENDERER_URL) {
