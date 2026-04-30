@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { javaManager } from '../services/javaManager'
@@ -40,7 +40,7 @@ export function registerJavaHandlers() {
     if (RENDERER_URL) {
       win.loadURL(RENDERER_URL + '?window=javaDownload')
     } else {
-      win.loadFile(join(__dirname, '../../dist/index.html'), {
+      win.loadFile(join(app.getAppPath(), 'dist/index.html'), {
         query: { window: 'javaDownload' },
       })
     }
