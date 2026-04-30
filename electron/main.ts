@@ -221,6 +221,7 @@ app.whenReady().then(() => {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
     },
+    icon: join(app.getAppPath(), 'public/iconreal.ico')
     })
     win.setMenuBarVisibility(false)
     if (RENDERER_URL) {
