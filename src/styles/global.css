@@ -137,7 +137,7 @@ textarea,
 select {
   font-family: var(--font-ui);
   font-size: 12px;
-  background: #1a1a1a;
+  background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -145,6 +145,26 @@ select {
   outline: none;
   transition: border-color 0.15s;
   width: 100%;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme='system'] {
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ebebeb;
+    --bg-tertiary: #e0e0e0;
+    --bg-hover: #d8d8d8;
+    --bg-active: #cccccc;
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --text-muted: #999999;
+    --accent: #2e7d32;
+    --accent-hover: #256427;
+    --accent-dim: #c8e6c9;
+    --accent-text: #1b5e20;
+    --border: #cccccc;
+    --border-light: #bbbbbb;
+    --scrollbar-thumb: #bbb;
+  }
 }
 
 input[type='text']:focus,

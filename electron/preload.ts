@@ -62,6 +62,7 @@ contextBridge.exposeInMainWorld('electron', {
   installUpdate: () => ipcRenderer.invoke('update:install'),
   onUpdateProgress: (cb: (percent: number) => void) => ipcRenderer.on('update:progress', (_e, percent) => cb(percent)),
   addOfflineAccount: (username: string) => ipcRenderer.invoke('accounts:addOffline', username),
+  
 
   // settings
   openSettings: () => ipcRenderer.invoke('window:settings'),

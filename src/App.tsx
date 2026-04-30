@@ -27,6 +27,9 @@ function App() {
 
   useEffect(() => {
     load().then(() => {
+      const config = useSettingsStore.getState().config
+      document.documentElement.setAttribute('data-theme', config.theme)
+      setLanguage(config.language)
       const params = new URLSearchParams(window.location.search)
       setIsFirstLaunch(params.get('firstLaunch') === 'true')
       setIsNewInstance(params.get('window') === 'newInstance')
@@ -37,6 +40,13 @@ function App() {
       setIsInstanceEditor(params.get('window') === 'instanceEditor')
       setEditorInstanceId(params.get('instanceId') ?? '')
       setIsAbout(params.get('window') === 'about')
+    })
+  }, [])
+
+  useEffect(() => {
+    window.electron.on('settings:updated', async () => {
+      const newConfig = await window.electron.getConfig()
+      document.documentElement.setAttribute('data-theme', newConfig.theme)
     })
   }, [])
 

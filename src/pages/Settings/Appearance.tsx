@@ -21,18 +21,6 @@ function Appearance() {
           <button>Open Folder</button>
         </div>
         <div className={styles.row}>
-          <span className={styles.label}>Icons</span>
-          <select
-            className={styles.select}
-            value={config.appearance.iconTheme}
-            onChange={e => set('appearance', { ...config.appearance, iconTheme: e.target.value })}
-          >
-            <option>Simple (Colored)</option>
-            <option>Simple (White)</option>
-          </select>
-          <button>Open Folder</button>
-        </div>
-        <div className={styles.row}>
           <button>Reload All</button>
         </div>
       </div>
