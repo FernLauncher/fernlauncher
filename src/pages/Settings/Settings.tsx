@@ -7,7 +7,6 @@ import Minecraft from './Minecraft'
 import Java from './Java'
 import Accounts from './Accounts'
 import Services from './Services'
-import Tools from './Tools'
 import Proxy from './Proxy'
 import styles from './Settings.module.css'
 
@@ -19,7 +18,6 @@ const PAGES = [
   'java',
   'accounts',
   'services',
-  'tools',
   'proxy',
 ] as const
 
@@ -33,7 +31,6 @@ const PAGE_ICONS: Record<Page, string> = {
   java: '☕',
   accounts: '👤',
   services: '🔧',
-  tools: '🛠',
   proxy: '🔒',
 }
 
@@ -50,7 +47,6 @@ function Settings() {
       case 'java': return <Java />
       case 'accounts': return <Accounts />
       case 'services': return <Services />
-      case 'tools': return <Tools />
       case 'proxy': return <Proxy />
     }
   }
