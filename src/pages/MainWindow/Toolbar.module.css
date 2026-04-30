@@ -1,0 +1,100 @@
+.toolbar {
+  height: 44px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.icon {
+  font-size: 14px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.accountBtn {
+  background: var(--accent-dim);
+  color: var(--accent-text);
+}
+
+.accountBtn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.relative {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  min-width: 200px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.menuRight {
+  left: auto;
+  right: 0;
+}
+
+.menuItem {
+  padding: 7px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.1s;
+}
+
+.menuItem:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.menuItemActive {
+  background: var(--accent-dim);
+  color: var(--accent-text);
+}
+
+.menuSep {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.menuKbd {
+  font-size: 10px;
+  color: var(--text-muted);
+}
