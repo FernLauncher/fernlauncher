@@ -38,7 +38,7 @@ function createMainWindow() {
     minWidth: 750,
     minHeight: 500,
     frame: true,
-    title: 'Fernlaunch',
+    title: 'Fernlauncher',
     webPreferences: {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
@@ -66,7 +66,7 @@ function createFirstLaunchWindow() {
     minWidth: 500,
     minHeight: 400,
     frame: true,
-    title: 'Welcome to Fernlaunch',
+    title: 'Welcome to Fernlauncher',
     webPreferences: {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
       sandbox: false,
@@ -94,7 +94,7 @@ function createNewInstanceWindow() {
     height: 580,
     minWidth: 600,
     minHeight: 500,
-    title: 'New Instance — Fernlaunch',
+    title: 'New Instance — Fernlauncher',
     center: true,
     webPreferences: {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
@@ -122,7 +122,7 @@ function createSettingsWindow() {
     height: 580,
     minWidth: 700,
     minHeight: 500,
-    title: 'Settings — Fernlaunch',
+    title: 'Settings — Fernlauncher',
     center: true,
     webPreferences: {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
@@ -150,7 +150,7 @@ function createConsoleWindow(instanceId: string) {
     height: 600,
     minWidth: 700,
     minHeight: 400,
-    title: 'Console — Fernlaunch',
+    title: 'Console — Fernlauncher',
     center: true,
     webPreferences: {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
@@ -215,7 +215,7 @@ app.whenReady().then(() => {
   const win = new BrowserWindow({
     width: 900,
     height: 650,
-    title: 'Edit Instance — Fernlaunch',
+    title: 'Edit Instance — Fernlauncher',
     center: true,
     webPreferences: {
       preload: join(__dirname, '../dist-electron/preload.cjs'),
@@ -259,7 +259,7 @@ app.whenReady().then(() => {
     const win = new BrowserWindow({
       width: 400,
       height: 380,
-      title: 'About Fernlaunch',
+      title: 'About Fernlauncher',
       resizable: false,
       center: true,
       webPreferences: {

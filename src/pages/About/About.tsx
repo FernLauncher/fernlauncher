@@ -4,7 +4,7 @@ function About() {
   return (
     <div className={styles.container}>
       <div className={styles.icon}>🌿</div>
-      <div className={styles.name}>Fernlaunch</div>
+      <div className={styles.name}>Fernlauncher</div>
       <div className={styles.version}>Version 1.0.0</div>
       <div className={styles.desc}>A Minecraft launcher built with Electron & React</div>
       <div className={styles.links}>
@@ -24,7 +24,7 @@ function About() {
           Electron · React · TypeScript · Vite · Zustand
         </div>
       </div>
-      <div className={styles.copy}>© 2026 Fernlaunch. MIT License.</div>
+      <div className={styles.copy}>© 2026 Fernlauncher. MIT License.</div>
     </div>
   )
 }

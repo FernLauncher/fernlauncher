@@ -29,7 +29,7 @@ function FirstLaunch({ onComplete }: Props) {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.logo}>🌿</div>
-        <h1 className={styles.title}>Fernlaunch</h1>
+        <h1 className={styles.title}>Fernlauncher</h1>
         <div className={styles.steps}>
           <div className={`${styles.step} ${step >= 0 ? styles.active : ''}`} />
           <div className={`${styles.step} ${step >= 1 ? styles.active : ''}`} />

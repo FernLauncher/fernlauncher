@@ -29,7 +29,7 @@ export function registerJavaHandlers() {
     const win = new BrowserWindow({
       width: 600,
       height: 500,
-      title: 'Install Java — Fernlaunch',
+      title: 'Install Java — Fernlauncher',
       center: true,
       webPreferences: {
         preload: join(__dirname, '../dist-electron/preload.cjs'),

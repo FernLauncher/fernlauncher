@@ -42,7 +42,7 @@ function Services() {
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>User Agent</div>
-        <input className={styles.input} placeholder="FernLaunch/$LAUNCHER_VER" value={s.userAgent}
+        <input className={styles.input} placeholder="FernLauncher/$LAUNCHER_VER" value={s.userAgent}
           onChange={e => set('services', { ...s, userAgent: e.target.value })} />
         <p className={styles.hint} style={{ marginTop: 4 }}>The special string $LAUNCHER_VER will be replaced with the version of the launcher.</p>
       </div>

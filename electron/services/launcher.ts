@@ -386,7 +386,7 @@ export async function launchInstance(instanceId: string): Promise<void> {
   if (!account) throw new Error('No active account. Please log in first.')
 
   sendStatus(instanceId, 'downloading')
-  sendLog(instanceId, '🌿 Fernlaunch starting...')
+  sendLog(instanceId, '🌿 Fernlauncher starting...')
   sendLog(instanceId, `Launching ${instance.name} (${instance.version})`)
 
   // 1. Fetch version manifest
@@ -601,7 +601,7 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
 
   const jvmVars: Record<string, string> = {
     natives_directory: nativesDir,
-    launcher_name: 'Fernlaunch',
+    launcher_name: 'Fernlauncher',
     launcher_version: '1.0.0',
     classpath: classpathStr,
     library_directory: librariesDir,

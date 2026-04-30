@@ -50,7 +50,7 @@ function Language() {
         ))}
       </div>
       <div className={styles.hint}>
-        Want to help translate Fernlaunch? Contribute on GitHub (Soon)!
+        Want to help translate Fernlauncher? Contribute on GitHub (Soon)!
       </div>
     </div>
   )

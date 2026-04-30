@@ -195,7 +195,7 @@ function NewInstance({ onClose }: Props) {
 
   const handleImport = async () => {
     const { filePaths } = await window.electron.openFileDialog({
-      filters: [{ name: 'Fernlaunch Pack', extensions: ['fernpack'] }],
+      filters: [{ name: 'Fernlauncher Pack', extensions: ['fernpack'] }],
     })
     if (filePaths?.[0]) {
       await window.electron.importInstance(filePaths[0])
@@ -329,7 +329,7 @@ function NewInstance({ onClose }: Props) {
     return (
     <div className={styles.dialog}>
       <div className={styles.titlebar}>
-        <span>New Instance — Fernlaunch</span>
+        <span>New Instance — Fernlauncher</span>
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
       </div>
 
@@ -432,7 +432,7 @@ function NewInstance({ onClose }: Props) {
             <div className={styles.importPane}>
               <div className={styles.importIcon}>📦</div>
               <div className={styles.importTitle}>Import Instance</div>
-              <div className={styles.importDesc}>Import a previously exported Fernlaunch instance (.fernpack file)</div>
+              <div className={styles.importDesc}>Import a previously exported Fernlauncher instance (.fernpack file)</div>
               <button className={`${styles.importBtn} primary`} onClick={handleImport}>📂 Choose .fernpack file</button>
               <div className={styles.importHint}>The instance will be imported with all its mods, worlds and settings intact.</div>
             </div>

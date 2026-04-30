@@ -67,9 +67,9 @@ function Toolbar({ onAddInstance }: Props) {
         window.electron.openExternalUrl('https://github.com/FernLauncher/fernlauncher/issues')
         break
       case 'Discord':
-        window.electron.openExternalUrl('https://discord.gg/fernlaunch')
+        window.electron.openExternalUrl('https://discord.gg/fernlauncher')
         break
-      case 'About Fernlaunch':
+      case 'About Fernlauncher':
         window.electron.openAbout()
         break
       case 'View logs':
@@ -116,7 +116,7 @@ function Toolbar({ onAddInstance }: Props) {
         </button>
         {showHelpMenu && (
           <div className={styles.menu}>
-            {['Clear Metadata Cache', 'Report a Bug or Suggest a Feature', 'View logs', 'Discord', 'About Fernlaunch'].map(item => (
+            {['Clear Metadata Cache', 'Report a Bug or Suggest a Feature', 'View logs', 'Discord', 'About Fernlauncher'].map(item => (
               <div key={item} className={styles.menuItem} onClick={() => handleHelpItem(item)}>{item}</div>
             ))}
           </div>

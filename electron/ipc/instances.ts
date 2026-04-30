@@ -295,7 +295,7 @@ export function registerInstanceHandlers() {
     if (app.isPackaged) {
       shell.writeShortcutLink(filePath, {
         target: process.execPath,
-        description: `Launch ${instance.name} via Fernlaunch`,
+        description: `Launch ${instance.name} via Fernlauncher`,
       })
     } else {
       dialog.showMessageBox({
@@ -312,7 +312,7 @@ export function registerInstanceHandlers() {
     const { filePath } = await dialog.showSaveDialog({
       title: 'Export Instance',
       defaultPath: `${instance.name}.fernpack`,
-      filters: [{ name: 'Fernlaunch Pack', extensions: ['fernpack'] }],
+      filters: [{ name: 'Fernlauncher Pack', extensions: ['fernpack'] }],
     })
 
     if (!filePath) return
