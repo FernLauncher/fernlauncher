@@ -17,7 +17,7 @@
 
 ### Game Support
 - Vanilla Minecraft (all versions)
-- **Fabric**, **Quilt**, **Forge** (1.8.9, 1.12.2, 1.21+), **NeoForge**
+- **Fabric**, **Quilt**, **Forge**, **NeoForge**
 - Auto Java detection & download (Java 8, 17, 21)
 
 ### Instance Management
