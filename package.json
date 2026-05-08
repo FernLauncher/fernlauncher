@@ -1,5 +1,7 @@
 {
   "name": "fernlauncher",
+  "description": "A modern open-source Minecraft launcher",
+  "author": "Infinitumcraft",
   "private": true,
   "version": "1.1.0",
   "type": "module",
@@ -45,6 +47,7 @@
   },
   "main": "dist-electron/main.js",
   "build": {
+    "npmRebuild": false,
     "appId": "com.fernlauncher.app",
     "productName": "Fernlauncher",
     "copyright": "Copyright © 2026 FernLauncher",
