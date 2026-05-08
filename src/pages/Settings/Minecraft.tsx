@@ -8,7 +8,6 @@ type Tab = typeof TABS[number]
 function Minecraft() {
   const { config, set } = useSettingsStore()
   const [tab, setTab] = useState<Tab>('General')
-  const [envVars, setEnvVars] = useState<{name: string, value: string}[]>([])
 
   const mc = config.minecraft
 
@@ -146,27 +145,51 @@ function Minecraft() {
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Legacy Tweaks</div>
             <label className={styles.checkbox}>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={config.tweaks?.onlineFixes ?? false}
+                onChange={e => set('tweaks', { ...config.tweaks, onlineFixes: e.target.checked })}
+              />
               Enable online fixes (experimental)
             </label>
           </div>
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Native Libraries</div>
             <label className={styles.checkbox}>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={config.tweaks?.useSystemGLFW ?? false}
+                onChange={e => set('tweaks', { ...config.tweaks, useSystemGLFW: e.target.checked })}
+              />
               Use system installation of GLFW
             </label>
             <div className={styles.row} style={{ marginTop: 6 }}>
               <span className={styles.label}>GLFW library path:</span>
-              <input className={styles.input} placeholder="Path to glfw.dll library file" />
+              <input
+                className={styles.input}
+                placeholder="Path to glfw.dll library file"
+                value={config.tweaks?.glfwPath ?? ''}
+                onChange={e => set('tweaks', { ...config.tweaks, glfwPath: e.target.value })}
+                disabled={!config.tweaks?.useSystemGLFW}
+              />
             </div>
             <label className={styles.checkbox} style={{ marginTop: 10 }}>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={config.tweaks?.useSystemOpenAL ?? false}
+                onChange={e => set('tweaks', { ...config.tweaks, useSystemOpenAL: e.target.checked })}
+              />
               Use system installation of OpenAL
             </label>
             <div className={styles.row} style={{ marginTop: 6 }}>
               <span className={styles.label}>OpenAL library path:</span>
-              <input className={styles.input} placeholder="Path to OpenAL.dll library file" />
+              <input
+                className={styles.input}
+                placeholder="Path to OpenAL.dll library file"
+                value={config.tweaks?.openALPath ?? ''}
+                onChange={e => set('tweaks', { ...config.tweaks, openALPath: e.target.value })}
+                disabled={!config.tweaks?.useSystemOpenAL}
+              />
             </div>
           </div>
         </div>
@@ -177,25 +200,39 @@ function Minecraft() {
           <div className={styles.section}>
             <div className={styles.fieldBlock}>
               <label className={styles.fieldBlockLabel}>Pre-launch Command</label>
-              <input className={styles.input} />
+              <input
+                className={styles.input}
+                value={config.commands?.preLaunch ?? ''}
+                onChange={e => set('commands', { ...config.commands, preLaunch: e.target.value })}
+                placeholder="Command to run before Minecraft launches"
+              />
             </div>
             <div className={styles.fieldBlock}>
               <label className={styles.fieldBlockLabel}>Wrapper Command</label>
-              <input className={styles.input} />
+              <input
+                className={styles.input}
+                value={config.commands?.wrapper ?? ''}
+                onChange={e => set('commands', { ...config.commands, wrapper: e.target.value })}
+                placeholder="Wrapper command (e.g. mangohud)"
+              />
             </div>
             <div className={styles.fieldBlock}>
               <label className={styles.fieldBlockLabel}>Post-exit Command</label>
-              <input className={styles.input} />
+              <input
+                className={styles.input}
+                value={config.commands?.postExit ?? ''}
+                onChange={e => set('commands', { ...config.commands, postExit: e.target.value })}
+                placeholder="Command to run after Minecraft exits"
+              />
             </div>
             <p className={styles.hint}>Pre-launch command runs before the instance launches and post-exit command runs after it exits.</p>
-            <p className={styles.hint} style={{ marginTop: 8 }}>Both will be run in the launcher's working folder with extra environment variables:</p>
+            <p className={styles.hint} style={{ marginTop: 8 }}>Available variables:</p>
             <ul className={styles.varList}>
               <li><code>$INST_NAME</code> — Name of the instance</li>
-              <li><code>$INST_ID</code> — ID of the instance (its folder name)</li>
-              <li><code>$INST_DIR</code> — absolute path of the instance</li>
-              <li><code>$INST_MC_DIR</code> — absolute path of Minecraft</li>
+              <li><code>$INST_ID</code> — ID of the instance</li>
+              <li><code>$INST_DIR</code> — Absolute path of the instance</li>
+              <li><code>$INST_MC_DIR</code> — Absolute path of Minecraft</li>
               <li><code>$INST_JAVA</code> — Java binary used for launch</li>
-              <li><code>$INST_JAVA_ARGS</code> — command-line parameters used for launch</li>
             </ul>
           </div>
         </div>
@@ -204,26 +241,26 @@ function Minecraft() {
       {tab === 'Environment Variables' && (
         <div className={styles.tabContent}>
           <div className={styles.envToolbar}>
-            <button onClick={() => setEnvVars(v => [...v, { name: '', value: '' }])}>Add</button>
-            <button onClick={() => setEnvVars(v => v.slice(0, -1))}>Remove</button>
-            <button style={{ marginLeft: 'auto' }} onClick={() => setEnvVars([])}>Clear</button>
+            <button onClick={() => set('envVars', [...(config.envVars ?? []), { name: '', value: '' }])}>Add</button>
+            <button onClick={() => set('envVars', (config.envVars ?? []).slice(0, -1))}>Remove</button>
+            <button style={{ marginLeft: 'auto' }} onClick={() => set('envVars', [])}>Clear</button>
           </div>
           <div className={styles.envHeader}>
             <span>Name</span>
             <span>Value</span>
           </div>
           <div className={styles.envList}>
-            {envVars.map((env, i) => (
+            {(config.envVars ?? []).map((env, i) => (
               <div key={i} className={styles.envRow}>
                 <input
                   className={styles.input}
                   value={env.name}
-                  onChange={e => setEnvVars(v => v.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
+                  onChange={e => set('envVars', (config.envVars ?? []).map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
                 />
                 <input
                   className={styles.input}
                   value={env.value}
-                  onChange={e => setEnvVars(v => v.map((x, j) => j === i ? { ...x, value: e.target.value } : x))}
+                  onChange={e => set('envVars', (config.envVars ?? []).map((x, j) => j === i ? { ...x, value: e.target.value } : x))}
                 />
               </div>
             ))}

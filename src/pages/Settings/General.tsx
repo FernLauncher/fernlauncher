@@ -5,6 +5,14 @@ import styles from './SettingsPage.module.css'
 function General() {
   const { t } = useI18n()
   const { config, set } = useSettingsStore()
+  const handleBrowseFolder = async (key: keyof typeof config.folders) => {
+    const result = await window.electron.browseFolder(key)
+    if (result) set('folders', { ...config.folders, [key]: result })
+  }
+
+  const handleOpenFolder = (key: keyof typeof config.folders) => {
+    window.electron.openLauncherFolder(key)
+  }
 
   return (
     <div className={styles.page}>
@@ -91,7 +99,8 @@ function General() {
               value={config.folders[key]}
               onChange={e => set('folders', { ...config.folders, [key]: e.target.value })}
             />
-            <button>{t('common.browse')}</button>
+            <button onClick={() => handleOpenFolder(key)}>📁</button>
+            <button onClick={() => handleBrowseFolder(key)}>{t('common.browse')}</button>
           </div>
         ))}
       </div>

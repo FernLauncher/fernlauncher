@@ -7,6 +7,14 @@ function Services() {
 
   return (
     <div className={styles.page}>
+      <label className={styles.checkbox}>
+        <input
+          type="checkbox"
+          checked={config.discordRpc ?? true}
+          onChange={e => set('discordRpc', e.target.checked)}
+        />
+        Enable Discord Rich Presence
+      </label>
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Pastebin Service</div>
         <div className={styles.row}>

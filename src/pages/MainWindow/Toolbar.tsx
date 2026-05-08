@@ -78,6 +78,9 @@ function Toolbar({ onAddInstance }: Props) {
       case 'Clear Metadata Cache':
         window.electron.clearMetadataCache()
         break
+      case 'Check for Updates':
+        window.electron.checkForUpdates()
+        break
     }
   }
 
@@ -116,7 +119,7 @@ function Toolbar({ onAddInstance }: Props) {
         </button>
         {showHelpMenu && (
           <div className={styles.menu}>
-            {['Clear Metadata Cache', 'Report a Bug or Suggest a Feature', 'View logs', 'Discord', 'About Fernlauncher'].map(item => (
+            {['Check for Updates', 'Clear Metadata Cache', 'Report a Bug or Suggest a Feature', 'View logs', 'Discord', 'About Fernlauncher'].map(item => (
               <div key={item} className={styles.menuItem} onClick={() => handleHelpItem(item)}>{item}</div>
             ))}
           </div>

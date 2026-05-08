@@ -13,6 +13,7 @@ function MainWindow() {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [updateDownloaded, setUpdateDownloaded] = useState(false)
   const [updateProgress, setUpdateProgress] = useState(0)
+  const [showUpToDate, setShowUpToDate] = useState(false)
 
 
   useEffect(() => {
@@ -37,6 +38,13 @@ function MainWindow() {
     window.electron.onUpdateProgress(pct => setUpdateProgress(pct))
   }, [])
 
+  useEffect(() => {
+    window.electron.onUpdateNotAvailable(() => {
+      setShowUpToDate(true)
+      setTimeout(() => setShowUpToDate(false), 3000)
+    })
+  }, [])
+
   const selected = instances.find(i => i.id === selectedId) ?? null
 
   return (
@@ -50,6 +58,11 @@ function MainWindow() {
       {updateAvailable && !updateDownloaded && (
         <div className={styles.updateBanner}>
           ⬇ Downloading update... {updateProgress}%
+        </div>
+      )}
+      {showUpToDate && (
+        <div className={styles.upToDateBanner}>
+          ✅ Fernlaunch is up to date!
         </div>
       )}
       <Toolbar onAddInstance={() => window.electron.openNewInstance()} />

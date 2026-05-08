@@ -31,19 +31,22 @@ function ConsoleWindow({ instanceId }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    window.electron.on('instance:log', (data: any) => {
+    const logHandler = (data: any) => {
       if (data.instanceId !== instanceId) return
       setLines(prev => [...prev, parseLine(data.line)])
-    })
+    }
 
-    window.electron.on('instance:status', (data: any) => {
+    const statusHandler = (data: any) => {
       if (data.instanceId !== instanceId) return
       setStatus(data.status)
-    })
+    }
+
+    window.electron.on('instance:log', logHandler)
+    window.electron.on('instance:status', statusHandler)
 
     return () => {
-      window.electron.off('instance:log', () => {})
-      window.electron.off('instance:status', () => {})
+      window.electron.off('instance:log', logHandler)
+      window.electron.off('instance:status', statusHandler)
     }
   }, [instanceId])
 

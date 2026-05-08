@@ -161,7 +161,9 @@ export function registerInstanceHandlers() {
   })
 
   ipcMain.handle('instances:launch', (_event, id: string) => launchInstance(id))
-  ipcMain.handle('instances:kill', (_event, id: string) => killInstance(id))
+  ipcMain.handle('instances:kill', (_event, id: string) => {
+    if (isInstanceRunning(id)) killInstance(id)
+  })
   ipcMain.handle('instances:isRunning', (_event, id: string) => isInstanceRunning(id))
 
   ipcMain.handle('instance:listFolder', async (_event, instanceId: string, subPath: string) => {

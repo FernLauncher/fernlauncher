@@ -1,7 +1,7 @@
 import { useI18n } from '../../hooks/useI18n'
 import styles from './RightPanel.module.css'
 import { useInstanceStore } from '../../store/instanceStore'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface Props {
   instance: Instance
@@ -48,7 +48,7 @@ function RightPanel({ instance }: Props) {
 
   const [iconSrc, setIconSrc] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadIcon = useCallback(() => {
     if (instance.icon && instance.icon !== 'default') {
       window.electron.getInstanceIconData(instance.id, instance.icon).then(setIconSrc)
     } else {
@@ -56,11 +56,17 @@ function RightPanel({ instance }: Props) {
     }
   }, [instance.icon, instance.id])
 
+  useEffect(() => {
+    loadIcon()
+  }, [loadIcon])
+
+  useEffect(() => {
+    window.electron.on('instances:updated', loadIcon)
+    return () => window.electron.off('instances:updated', loadIcon)
+  }, [loadIcon])
+
   const handleIconClick = async () => {
-    const iconPath = await window.electron.setInstanceIcon(instance.id)
-    if (iconPath) {
-      window.electron.getInstanceIconData(instance.id, instance.icon).then(setIconSrc)
-    }
+    await window.electron.setInstanceIcon(instance.id)
   }
 
   return (

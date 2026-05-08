@@ -102,12 +102,18 @@ function findJavaInDir(dir: string): JavaInstall[] {
 }
 
 function getRequiredJavaMajor(mcVersion: string): number {
+  // New version format: year.drop.hotfix (e.g. 26.1.2)
+  // These require Java 25+
+  const newFormat = mcVersion.match(/^(\d{2,})\./)
+  if (newFormat && parseInt(newFormat[1]) >= 26) return 25
+
+  // Old format: 1.x.x
   const parts = mcVersion.split('.')
   const minor = parseInt(parts[1] ?? '0')
-  parseInt(parts[2] ?? '0')
+
   if (minor >= 21) return 21
-  if (minor >= 18) return 17
   if (minor >= 17) return 17
+  if (minor >= 13) return 8
   return 8
 }
 
@@ -178,8 +184,13 @@ async function autoDownloadJava(majorVersion: number, onProgress?: (msg: string)
     fs.mkdirSync(destDir, { recursive: true })
 
     onProgress?.(`Downloading Java ${majorVersion}...`)
+    let lastReported = -1
     await downloadFile(downloadUrl, destFile, pct => {
-      onProgress?.(`Downloading Java ${majorVersion}: ${pct}%`)
+      const rounded = Math.floor(pct / 10) * 10
+      if (rounded > lastReported) {
+        lastReported = rounded
+        onProgress?.(`Downloading Java ${majorVersion}: ${rounded}%`)
+      }
     })
 
     // Extract

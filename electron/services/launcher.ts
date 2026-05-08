@@ -9,6 +9,7 @@ import { accountManager } from './auth/accounts'
 import { instanceManager } from './instanceManager'
 import { config } from '../utils/config'
 import { BrowserWindow, app } from 'electron'
+import { setDiscordActivity, setIdleActivity } from './discordRpc'
 
 const activeProcesses = new Map<string, ChildProcess>()
 const instanceStartTimes = new Map<string, number>()
@@ -70,6 +71,7 @@ function downloadFile(url: string, dest: string): Promise<void> {
 // ─── IPC helpers ─────────────────────────────────────────────────────────────
 
 function sendLog(instanceId: string, line: string) {
+  console.log('[sendLog]', line.substring(0, 50), new Error().stack?.split('\n')[2])
   consoleWindows.get(instanceId)?.webContents.send('instance:log', { instanceId, line })
 }
 
@@ -256,11 +258,14 @@ async function applyForge(
   let versionId = findForgeDir()
 
   const zip = new AdmZip(installerPath)
-  const isOldInstaller = zip.getEntries().some(e => e.entryName.includes('SimpleInstaller'))
+  const installProfile = JSON.parse(zip.readAsText('install_profile.json'))
+  const isOldInstaller = 'versionInfo' in installProfile
+  console.log('[Forge] isOldInstaller:', isOldInstaller)
 
   if (!versionId) {
     if (isOldInstaller) {
       const installProfile = JSON.parse(zip.readAsText('install_profile.json'))
+      console.log('[Forge] install_profile keys:', Object.keys(installProfile))
       const versionJson = installProfile.versionInfo
       const forgeVersionId = versionJson.id as string
 
@@ -306,51 +311,75 @@ async function applyForge(
     }
   }
 
+  // Ensure universal jar exists and add to classpath
+  const universalJarPath = path.join(librariesDir, 'net', 'minecraftforge', 'forge', fullVersion, `forge-${fullVersion}-universal.jar`)
+  if (isOldInstaller) {
+    if (!fs.existsSync(universalJarPath)) {
+      const universalEntry = zip.getEntries().find(e => e.entryName.endsWith('-universal.jar'))
+      if (universalEntry) {
+        fs.mkdirSync(path.dirname(universalJarPath), { recursive: true })
+        zip.extractEntryTo(universalEntry, path.dirname(universalJarPath), false, true)
+        const extractedPath = path.join(path.dirname(universalJarPath), universalEntry.entryName)
+        if (fs.existsSync(extractedPath) && extractedPath !== universalJarPath) {
+          fs.renameSync(extractedPath, universalJarPath)
+        }
+      }
+    }
+    if (fs.existsSync(universalJarPath)) {
+      classpath.push(universalJarPath)
+      console.log('[Forge] Added universal jar to classpath')
+    }
+  }
+
   if (!versionId) throw new Error('Could not find Forge version directory after installation')
 
   const versionJsonPath = path.join(versionsDir, versionId, `${versionId}.json`)
   const versionProfile = JSON.parse(fs.readFileSync(versionJsonPath, 'utf-8'))
 
-  // Add libraries to classpath — old and new format differ
-if (isOldInstaller) {
-  for (const lib of versionProfile.libraries ?? []) {
-    const parts = lib.name.split(':')
-    const group = parts[0].replace(/\./g, '/')
-    const artifact = parts[1]
-    const version = parts[2]
-    const isForgeLib = group.includes('minecraftforge') && artifact === 'forge'
-    const jarName = isForgeLib ? `${artifact}-${version}-universal.jar` : `${artifact}-${version}.jar`
-    const libPath = path.join(librariesDir, group, artifact, version, jarName)
+  // Add other libraries to classpath for old installer
+  if (isOldInstaller) {
+    for (const lib of versionProfile.libraries ?? []) {
+      const parts = lib.name.split(':')
+      const group = parts[0].replace(/\./g, '/')
+      const artifact = parts[1]
+      const version = parts[2]
+      const isForgeLib = group.includes('minecraftforge') && artifact === 'forge'
+      if (isForgeLib) continue // already handled above
+      const libPath = path.join(librariesDir, group, artifact, version, `${artifact}-${version}.jar`)
+      if (fs.existsSync(libPath)) classpath.push(libPath)
+      else console.warn(`[Forge] Missing lib: ${lib.name}`)
+    }
+  }
 
-    if (!fs.existsSync(libPath) && !isForgeLib) {
-      const urls = [
-        lib.url ? `${lib.url}${group}/${artifact}/${version}/${jarName}` : null,
-        `https://libraries.minecraft.net/${group}/${artifact}/${version}/${jarName}`,
-        `https://maven.minecraftforge.net/${group}/${artifact}/${version}/${jarName}`,
-      ].filter(Boolean) as string[]
-
-      for (const url of urls) {
-        try {
-          await downloadFile(url, libPath)
-          break
-        } catch (e) {
-          console.warn(`[Forge] Failed: ${url}`)
+  if (!isOldInstaller) {
+    for (const lib of versionProfile.libraries ?? []) {
+      if (lib.downloads?.artifact?.path) {
+        const libPath = path.join(librariesDir, lib.downloads.artifact.path)
+        if (fs.existsSync(libPath)) {
+          classpath.push(libPath)
+        } else {
+          console.warn('[Forge] Missing new forge lib:', lib.name, libPath)
         }
       }
     }
-
-    if (fs.existsSync(libPath)) classpath.unshift(libPath)
-    else console.warn(`[Forge] Missing lib: ${lib.name}`)
+    console.log('[Forge] New forge classpath entries:', classpath.filter(p => p.includes('forge')))
   }
-}
-  console.log('[Forge versionProfile libs]', JSON.stringify(versionProfile.libraries?.slice(0, 3), null, 2))
+
+  if (!versionId) throw new Error('Could not find Forge version directory after installation')
+    
+  console.log('[Forge] mainClass:', versionProfile.mainClass)
+  console.log('[Forge] classpath forge entries:', classpath.filter(p => p.includes('forge')))
 
   return {
     mainClass: versionProfile.mainClass ?? 'net.minecraftforge.bootstrap.ForgeBootstrap',
     gameArgs: versionProfile.arguments?.game
       ? (versionProfile.arguments.game).filter((a: any) => typeof a === 'string')
       : (versionProfile.minecraftArguments?.split(' ') ?? []),
-    jvmArgs: (versionProfile.arguments?.jvm ?? []).filter((a: any) => typeof a === 'string'),
+    jvmArgs: [
+      '-Dfml.ignoreInvalidMinecraftCertificates=true',
+      '-Dfml.ignorePatchDiscrepancies=true',
+      ...(versionProfile.arguments?.jvm ?? []).filter((a: any) => typeof a === 'string'),
+    ],
   }
 }
 
@@ -391,7 +420,8 @@ export async function launchInstance(instanceId: string): Promise<void> {
 
   // 1. Fetch version manifest
   sendLog(instanceId, 'Fetching version manifest...')
-  const manifest = await fetchJson('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json')
+  const metaServer = cfg.services?.metaServer || 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json'
+  const manifest = await fetchJson(metaServer)
   const versionEntry = manifest.versions.find((v: any) => v.id === instance.version)
   if (!versionEntry) throw new Error(`Version ${instance.version} not found in manifest`)
   const versionJson = await fetchJson(versionEntry.url)
@@ -522,6 +552,8 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
   fs.mkdirSync(indexesDir, { recursive: true })
   fs.mkdirSync(objectsDir, { recursive: true })
 
+  const assetsServer = cfg.services?.assetsServer || 'https://resources.download.minecraft.net/'
+
   const assetIndex = versionJson.assetIndex
   const assetIndexPath = path.join(indexesDir, `${assetIndex.id}.json`)
   await downloadFile(assetIndex.url, assetIndexPath)
@@ -536,7 +568,7 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
       const prefix = hash.substring(0, 2)
       const assetPath = path.join(objectsDir, prefix, hash)
       if (!fs.existsSync(assetPath)) {
-        await downloadFile(`https://resources.download.minecraft.net/${prefix}/${hash}`, assetPath)
+        await downloadFile(`${assetsServer}${prefix}/${hash}`, assetPath)
       }
       downloadedAssets++
       const percent = Math.round((downloadedAssets / assetObjects.length) * 100)
@@ -659,6 +691,20 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
   const extraJvmArgs = (instance.jvmArgs ?? cfg.java.jvmArgs)
     ? (instance.jvmArgs ?? cfg.java.jvmArgs).split(' ').filter(Boolean)
     : []
+  
+  // Tweaks
+  if (cfg.tweaks?.useSystemGLFW && cfg.tweaks.glfwPath) {
+    extraJvmArgs.push(`-Dorg.lwjgl.glfw.libname=${cfg.tweaks.glfwPath}`)
+  }
+  if (cfg.tweaks?.useSystemOpenAL && cfg.tweaks.openALPath) {
+    extraJvmArgs.push(`-Dorg.lwjgl.openal.libname=${cfg.tweaks.openALPath}`)
+  }
+  if (cfg.tweaks?.onlineFixes) {
+    extraJvmArgs.push('-Dminecraft.api.auth.host=https://nope.invalid')
+    extraJvmArgs.push('-Dminecraft.api.account.host=https://nope.invalid')
+    extraJvmArgs.push('-Dminecraft.api.session.host=https://nope.invalid')
+    extraJvmArgs.push('-Dminecraft.api.services.host=https://nope.invalid')
+  }
 
     const winWidth = instance.windowWidth ?? cfg.minecraft.windowWidth
     const winHeight = instance.windowHeight ?? cfg.minecraft.windowHeight
@@ -667,31 +713,72 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
       ? ['--fullscreen']
       : ['--width', String(winWidth), '--height', String(winHeight)]
 
-    const finalArgs = [
-      
-      ...memArgs,
-      ...extraJvmArgs,
-      `-DlibraryDirectory=${librariesDir}`,
-      ...replaceVars(neoForgeJvmArgs, jvmVars),
-      ...replaceVars(forgeJvmArgs, jvmVars),
-      ...replaceVars(jvmArgs, jvmVars),
-      mainClass,
-      // For old Forge, forgeGameArgs already contains all game args including --tweakClass
-      // For new Forge/NeoForge, use vanilla gameArgs + mod loader args
-      ...(forgeGameArgs.length > 0 && forgeGameArgs.includes('--tweakClass')
-        ? replaceVars(forgeGameArgs, gameVars)
-        : [...replaceVars(gameArgs, gameVars), ...neoForgeGameArgs, ...forgeGameArgs]
-      ),
-      ...windowArgs,
+    const javaMajor = getJavaMajor(javaPath)
+
+    const unsupportedArgs = [
+      ...(javaMajor < 23 ? ['--sun-misc-unsafe-memory-access=allow'] : []),
+      ...(javaMajor < 21 ? ['--enable-native-access=ALL-UNNAMED'] : []),
     ]
+
+    const finalArgs = [
+    ...memArgs,
+    ...extraJvmArgs,
+    `-DlibraryDirectory=${librariesDir}`,
+    ...replaceVars(neoForgeJvmArgs, jvmVars),
+    ...replaceVars(forgeJvmArgs, jvmVars),
+    ...replaceVars(jvmArgs, jvmVars).filter(a => !unsupportedArgs.includes(a)),
+    mainClass,
+    ...(forgeGameArgs.length > 0 && forgeGameArgs.includes('--tweakClass')
+      ? replaceVars(forgeGameArgs, gameVars)
+      : [...replaceVars(gameArgs, gameVars), ...neoForgeGameArgs, ...forgeGameArgs]
+    ),
+    ...windowArgs,
+  ]
 
   // 8. Spawn process
   sendLog(instanceId, 'Launching Minecraft!')
   sendStatus(instanceId, 'launching')
 
-  const proc = spawn(javaPath, finalArgs, {
+    // Run pre-launch command
+  if (cfg.commands?.preLaunch) {
+    const preLaunchCmd = cfg.commands.preLaunch
+      .replace('$INST_NAME', instance.name)
+      .replace('$INST_ID', instance.id)
+      .replace('$INST_DIR', path.join(Paths.instances, instance.id))
+      .replace('$INST_MC_DIR', mcDir)
+      .replace('$INST_JAVA', javaPath)
+    
+    sendLog(instanceId, `Running pre-launch command: ${preLaunchCmd}`)
+    await new Promise<void>((resolve, reject) => {
+      const [cmd, ...args] = preLaunchCmd.split(' ')
+      const p = spawn(cmd, args, { shell: true })
+      p.on('close', code => {
+        if (code !== 0) reject(new Error(`Pre-launch command failed with code ${code}`))
+        else resolve()
+      })
+      p.on('error', reject)
+    })
+  }
+
+  // Build env vars
+  const envVars: Record<string, string> = (cfg.envVars ?? []).reduce((acc, { name, value }) => {
+    if (name) acc[name] = value
+    return acc
+  }, {} as Record<string, string>)
+
+  // Apply wrapper command
+  let spawnCmd = javaPath
+  let spawnArgs = finalArgs
+  if (cfg.commands?.wrapper) {
+    const wrapperParts = cfg.commands.wrapper.split(' ')
+    spawnCmd = wrapperParts[0]
+    spawnArgs = [...wrapperParts.slice(1), javaPath, ...finalArgs]
+  }
+  
+
+  const proc = spawn(spawnCmd, spawnArgs, {
     cwd: mcDir,
-    env: { ...process.env },
+    env: { ...process.env, ...envVars },
   })
 
   activeProcesses.set(instanceId, proc)
@@ -713,10 +800,28 @@ for (const jar of [...neoClasspath, ...vanillaClasspath]) {
         .filter(w => !w.webContents.getURL().includes('console'))
         .forEach(w => w.hide())
     }
+    const instance = instanceManager.getAll().find(i => i.id === instanceId)
+    if (instance) {
+      setDiscordActivity(instance.name, instance.version, instance.modLoader)
+    }
   })
 
   proc.on('close', code => {
     activeProcesses.delete(instanceId)
+    setIdleActivity()
+    console.log('[Launcher] Process exited with code:', code)
+    // Run post-exit command
+  if (cfg.commands?.postExit) {
+    const postCmd = cfg.commands.postExit
+      .replace('$INST_NAME', instance.name)
+      .replace('$INST_ID', instance.id)
+      .replace('$INST_DIR', path.join(Paths.instances, instance.id))
+      .replace('$INST_MC_DIR', mcDir)
+      .replace('$INST_JAVA', javaPath)
+    
+    const [cmd, ...args] = postCmd.split(' ')
+    spawn(cmd, args, { shell: true })
+  }
     // Track playtime
 
       if (cfg.minecraft.recordPlayTime) {

@@ -73,6 +73,11 @@ declare global {
       openFileDialog: (options: any) => Promise<{ filePaths: string[] }>
       onUpdateProgress: (cb: (percent: number) => void) => void
       addOfflineAccount: (username: string) => Promise<Account>
+      browseFolder: (key: string) => Promise<string | null>
+      checkForUpdates: () => Promise<void>
+      onUpdateNotAvailable: (cb: () => void) => void
+      showInstanceContextMenu: (instanceId: string) => Promise<void>
+      onInstanceAction: (cb: (data: { action: string, instanceId: string }) => void) => void
       java:downloadProgress
       on: (channel: string, callback: (...args: unknown[]) => void) => void
       off: (channel: string, callback: (...args: unknown[]) => void) => void

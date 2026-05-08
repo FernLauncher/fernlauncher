@@ -1,19 +1,28 @@
 import { useInstanceStore } from '../../store/instanceStore'
 import { useSettingsStore } from '../../store/settingsStore'
 import { useI18n } from '../../hooks/useI18n'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import styles from './InstanceGrid.module.css'
 
 function InstanceIcon({ instance }: { instance: Instance }) {
   const [iconSrc, setIconSrc] = useState<string | null>(null)
+  const instanceRef = useRef(instance)
+  useEffect(() => { instanceRef.current = instance }, [instance])
 
   useEffect(() => {
-    if (instance.icon && instance.icon !== 'default') {
-      window.electron.getInstanceIconData(instance.id, instance.icon).then(p => setIconSrc(p))
-    } else {
-      setIconSrc(null)
+    const loadIcon = () => {
+      const inst = instanceRef.current
+      if (inst.icon && inst.icon !== 'default') {
+        window.electron.getInstanceIconData(inst.id, inst.icon).then(p => setIconSrc(p))
+      } else {
+        setIconSrc(null)
+      }
     }
-  }, [instance.icon, instance.id])
+
+    loadIcon()
+    window.electron.on('instances:updated', loadIcon)
+    return () => window.electron.off('instances:updated', loadIcon)
+  }, [])
 
   return (
     <div className={styles.icon}>
@@ -25,18 +34,56 @@ function InstanceIcon({ instance }: { instance: Instance }) {
   )
 }
 
-function InstanceCard({ instance }: { instance: Instance }) {
+function InstanceCard({ instance, isRenaming, onRenameComplete }: {
+  instance: Instance
+  isRenaming?: boolean
+  onRenameComplete?: () => void
+}) {
   const { selectedId, select } = useInstanceStore()
   const isSelected = selectedId === instance.id
+  const [newName, setNewName] = useState(instance.name)
+
+  useEffect(() => {
+    if (isRenaming) setNewName(instance.name)
+  }, [isRenaming, instance.name])
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    select(instance.id)
+    window.electron.showInstanceContextMenu(instance.id)
+  }
+
+  const handleRename = async () => {
+    if (newName.trim() && newName !== instance.name) {
+      await window.electron.updateInstance({ ...instance, name: newName.trim() })
+    }
+    onRenameComplete?.()
+  }
 
   return (
     <div
       className={`${styles.card} ${isSelected ? styles.selected : ''}`}
       onClick={() => select(instance.id)}
       onDoubleClick={() => window.electron.launchInstance(instance.id)}
+      onContextMenu={handleContextMenu}
     >
       <InstanceIcon instance={instance} />
-      <span className={styles.name}>{instance.name}</span>
+      {isRenaming ? (
+        <input
+          className={styles.renameInput}
+          value={newName}
+          onChange={e => setNewName(e.target.value)}
+          onBlur={handleRename}
+          onKeyDown={e => {
+            if (e.key === 'Enter') handleRename()
+            if (e.key === 'Escape') onRenameComplete?.()
+          }}
+          autoFocus
+          onClick={e => e.stopPropagation()}
+        />
+      ) : (
+        <span className={styles.name}>{instance.name}</span>
+      )}
       {instance.modLoader !== 'none' && (
         <span className={styles.loader}>{instance.modLoader}</span>
       )}
@@ -46,8 +93,33 @@ function InstanceCard({ instance }: { instance: Instance }) {
 
 function InstanceGrid() {
   const { t } = useI18n()
-  const { instances } = useInstanceStore()
+  const { instances, remove } = useInstanceStore()
   const { config } = useSettingsStore()
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+
+  const removeRef = useRef(remove)
+  useEffect(() => { removeRef.current = remove }, [remove])
+
+  useEffect(() => {
+    const handler = async ({ action, instanceId }: { action: string, instanceId: string }) => {
+      switch (action) {
+        case 'launch': window.electron.launchInstance(instanceId); break
+        case 'kill': window.electron.killInstance(instanceId); break
+        case 'edit': window.electron.openInstanceEditor(instanceId); break
+        case 'folder': window.electron.openInstanceFolder(instanceId, 'minecraft'); break
+        case 'export': window.electron.exportInstance(instanceId); break
+        case 'copy': window.electron.copyInstance(instanceId); break
+        case 'shortcut': window.electron.createShortcut(instanceId); break
+        case 'changeIcon': window.electron.setInstanceIcon(instanceId); break
+        case 'rename': setRenamingId(instanceId); break
+        case 'delete':
+          removeRef.current(instanceId)
+          window.electron.deleteInstance(instanceId)
+          break
+      }
+    }
+    window.electron.onInstanceAction(handler)
+  }, [])
 
   const sortedInstances = [...instances].sort((a, b) => {
     if (config.instanceSorting === 'lastLaunched') {
@@ -85,7 +157,12 @@ function InstanceGrid() {
           </div>
           <div className={styles.grid}>
             {items.map(instance => (
-              <InstanceCard key={instance.id} instance={instance} />
+              <InstanceCard
+                key={instance.id}
+                instance={instance}
+                isRenaming={renamingId === instance.id}
+                onRenameComplete={() => setRenamingId(null)}
+              />
             ))}
           </div>
         </div>

@@ -71,6 +71,20 @@ export interface AppConfig {
     skins: string
     downloads: string
   }
+  commands: {
+    preLaunch: string
+    wrapper: string
+    postExit: string
+  }
+  envVars: { name: string, value: string }[]
+    tweaks: {
+    onlineFixes: boolean
+    useSystemGLFW: boolean
+    glfwPath: string
+    useSystemOpenAL: boolean
+    openALPath: string
+  }
+  discordRpc: boolean
 }
 
 export const defaults: AppConfig = {
@@ -146,4 +160,18 @@ export const defaults: AppConfig = {
     skins: 'skins',
     downloads: '',
   },
+  commands: {
+    preLaunch: '',
+    wrapper: '',
+    postExit: '',
+  },
+  envVars: [],
+  tweaks: {
+    onlineFixes: false,
+    useSystemGLFW: false,
+    glfwPath: '',
+    useSystemOpenAL: false,
+    openALPath: '',
+  },
+  discordRpc: true,
 }

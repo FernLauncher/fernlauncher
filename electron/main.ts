@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, shell, dialog, Menu } from 'electron'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { config } from './utils/config'
@@ -11,6 +11,9 @@ import { registerVersionHandlers } from './ipc/versions'
 import { registerConsoleWindow } from './services/launcher'
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
+import { initDiscordRpc, destroyDiscordRpc } from './services/discordRpc'
+
+
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -116,6 +119,19 @@ function createNewInstanceWindow() {
   return win
 }
 
+async function applyProxy() {
+  const { session } = await import('electron')
+  const proxyConfig = config.get('proxy')
+  
+  if (proxyConfig.type === 'none') {
+    await session.defaultSession.setProxy({ mode: 'direct' })
+  } else if (proxyConfig.type === 'http' || proxyConfig.type === 'socks5') {
+    await session.defaultSession.setProxy({
+      proxyRules: `${proxyConfig.type}://${proxyConfig.address}:${proxyConfig.port}`,
+    })
+  }
+}
+
 function createSettingsWindow() {
   const win = new BrowserWindow({
     width: 850,
@@ -170,13 +186,16 @@ function createConsoleWindow(instanceId: string) {
   return win
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await applyProxy()
   registerSettingsHandlers()
   registerInstanceHandlers()
   registerAccountHandlers()
   registerJavaHandlers()
   registerVersionHandlers()
   ensureDirectories()
+  initDiscordRpc()
+  
 
   // Check for updates after app is ready (only in production)
   if (app.isPackaged) {
@@ -232,6 +251,7 @@ app.whenReady().then(() => {
       })
     }
   })
+  
 
   ipcMain.handle('launcher:openFolder', async (_event, key: string) => {
     const folderMap: Record<string, string> = {
@@ -242,6 +262,7 @@ app.whenReady().then(() => {
       java: Paths.java,
       icons: Paths.icons,
       logs: Paths.logs,
+      downloads: app.getPath('downloads'),
     }
     const folder = folderMap[key]
     if (folder) {
@@ -274,6 +295,50 @@ app.whenReady().then(() => {
     } else {
       win.loadFile(join(app.getAppPath(), 'dist/index.html'), { query: { window: 'about' } })
     }
+  })
+
+  ipcMain.handle('launcher:browseFolder', async (_event, key: string) => {
+    const result = await dialog.showOpenDialog({
+      title: `Select ${key} folder`,
+      properties: ['openDirectory'],
+    })
+    if (result.canceled) return null
+    return result.filePaths[0]
+  })
+
+  ipcMain.handle('launcher:checkForUpdates', async () => {
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdates()
+    } else {
+      BrowserWindow.getAllWindows()[0]?.webContents.send('update:notAvailable')
+    }
+  })
+
+  autoUpdater.on('update-not-available', () => {
+    BrowserWindow.getAllWindows()[0]?.webContents.send('update:notAvailable')
+  })
+
+  ipcMain.handle('instance:contextMenu', (_event, instanceId: string) => {
+    const win = BrowserWindow.getFocusedWindow()
+    if (!win) return
+
+    const menu = Menu.buildFromTemplate([
+      { label: 'Launch', click: () => win.webContents.send('instance:action', { action: 'launch', instanceId }) },
+      { label: 'Kill', click: () => win.webContents.send('instance:action', { action: 'kill', instanceId }) },
+      { type: 'separator' },
+      { label: 'Rename', click: () => win.webContents.send('instance:action', { action: 'rename', instanceId }) },
+      { label: 'Change Icon', click: () => win.webContents.send('instance:action', { action: 'changeIcon', instanceId }) },
+      { label: 'Edit...', click: () => win.webContents.send('instance:action', { action: 'edit', instanceId }) },
+      { label: 'Open Folder', click: () => win.webContents.send('instance:action', { action: 'folder', instanceId }) },
+      { type: 'separator' },
+      { label: 'Export...', click: () => win.webContents.send('instance:action', { action: 'export', instanceId }) },
+      { label: 'Copy', click: () => win.webContents.send('instance:action', { action: 'copy', instanceId }) },
+      { label: 'Create Shortcut', click: () => win.webContents.send('instance:action', { action: 'shortcut', instanceId }) },
+      { type: 'separator' },
+      { label: 'Delete', click: () => win.webContents.send('instance:action', { action: 'delete', instanceId }) },
+    ])
+
+    menu.popup({ window: win })
   })
 
   const isFirstLaunch = config.get('firstLaunch')
@@ -309,5 +374,6 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  destroyDiscordRpc()
   if (process.platform !== 'darwin') app.quit()
 })

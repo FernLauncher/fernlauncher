@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+ipcRenderer.setMaxListeners(50)
+
+const listenerMap = new Map<(...args: unknown[]) => void, (event: Electron.IpcRendererEvent, ...args: unknown[]) => void>()
+
 contextBridge.exposeInMainWorld('electron', {
   // config
   getConfig: () => ipcRenderer.invoke('config:get'),
@@ -62,6 +66,14 @@ contextBridge.exposeInMainWorld('electron', {
   installUpdate: () => ipcRenderer.invoke('update:install'),
   onUpdateProgress: (cb: (percent: number) => void) => ipcRenderer.on('update:progress', (_e, percent) => cb(percent)),
   addOfflineAccount: (username: string) => ipcRenderer.invoke('accounts:addOffline', username),
+  browseFolder: (key: string) => ipcRenderer.invoke('launcher:browseFolder', key),
+  checkForUpdates: () => ipcRenderer.invoke('launcher:checkForUpdates'),
+  onUpdateNotAvailable: (cb: () => void) => ipcRenderer.on('update:notAvailable', cb),
+  showInstanceContextMenu: (instanceId: string) => ipcRenderer.invoke('instance:contextMenu', instanceId),
+  onInstanceAction: (cb: (data: { action: string, instanceId: string }) => void) => {
+    ipcRenderer.removeAllListeners('instance:action')
+    ipcRenderer.on('instance:action', (_e, data) => cb(data))
+  },
   
 
   // settings
@@ -83,10 +95,17 @@ contextBridge.exposeInMainWorld('electron', {
   refreshAccount: (id: string) => ipcRenderer.invoke('accounts:refresh', id),
 
   // on events (main -> renderer)
+
   on: (channel: string, callback: (...args: unknown[]) => void) => {
-    ipcRenderer.on(channel, (_event, ...args) => callback(...args))
+    const wrapper = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => callback(...args)
+    listenerMap.set(callback, wrapper)
+    ipcRenderer.on(channel, wrapper)
   },
   off: (channel: string, callback: (...args: unknown[]) => void) => {
-    ipcRenderer.off(channel, (_event, ...args) => callback(...args))
+    const wrapper = listenerMap.get(callback)
+    if (wrapper) {
+      ipcRenderer.off(channel, wrapper)
+      listenerMap.delete(callback)
+    }
   },
 })

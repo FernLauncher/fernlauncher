@@ -5,7 +5,7 @@ function About() {
     <div className={styles.container}>
       <div className={styles.icon}>🌿</div>
       <div className={styles.name}>Fernlauncher</div>
-      <div className={styles.version}>Version 1.0.0</div>
+      <div className={styles.version}>Version 1.1.0</div>
       <div className={styles.desc}>A Minecraft launcher built with Electron & React</div>
       <div className={styles.links}>
         <button onClick={() => window.electron.openExternalUrl('https://github.com/FernLauncher/fernlauncher')}>
